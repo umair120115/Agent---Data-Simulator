@@ -1,0 +1,36 @@
+# --- Virtual Environments ---
+# Ignores the most common names for venv folders
+venv/
+.venv/
+env/
+.env/
+ENV/
+ai/
+
+# --- Environment Variables (Security) ---
+# CRITICAL: Never commit your API keys
+.env
+.env.local
+.env.*
+
+# --- Python Cache & Build ---
+__pycache__/
+*.py[cod]
+*$py.class
+build/
+dist/
+*.egg-info/
+
+# --- IDE/Editor Settings ---
+# VS Code
+.vscode/
+# JetBrains (PyCharm)
+.idea/
+
+# --- Local Data/Output ---
+# Ignore the data/debug files your agent generates
+# *.txt
+*.csv
+*.json
+*.log
+# debug_raw_response.txt
