@@ -1,93 +1,41 @@
-# #Dynamic schema generator 
-
-# import json
-# from langchain_core.prompts import ChatPromptTemplate
-# from app.llm import get_llm
-
-# prompt = ChatPromptTemplate.from_messages([
-#     ("system",
-#      "You generate realistic synthetic data strictly following the schema."),
-#     ("human",
-#      "Schema:\n{schema}\n"
-#      "Generate {batch_size} rows.\n"
-#      "Return ONLY a JSON array.")
-# ])
-
-# def generate_batch(state: dict):
-#     llm = get_llm()
-
-#     response = llm.invoke(prompt.format(
-#         schema=state["schema"].model_dump(),
-#         batch_size=state["batch"]["size"]
-#     ))
-
-#     rows = json.loads(response.content)
-
-#     return {"rows": rows}
-
-
-import json
+import json, time
 from langchain_core.prompts import ChatPromptTemplate
 from app.llm import get_llm
-import json
-import re
 
-def safe_json_load(text: str):
-    if not text or not text.strip():
-        raise ValueError("Empty response from LLM")
-
-    # Remove markdown code fences if present
-    text = text.strip()
-    text = re.sub(r"^```json", "", text)
-    text = re.sub(r"^```", "", text)
-    text = re.sub(r"```$", "", text)
-
-    return json.loads(text)
-prompt = ChatPromptTemplate.from_messages([
-    ("system",
-     "You generate realistic synthetic data strictly following the schema."),
-    ("human",
-     "Schema:\n{schema}\n"
-     "Generate {batch_size} rows.\n"
-     "Return ONLY a JSON array.")
-])
-
-
-from langchain_core.prompts import ChatPromptTemplate
-from app.llm import get_llm
-import time
+def safe_json(text):
+    return json.loads(text.replace("```json", "").replace("```", "").strip())
 
 def generate_batches(state: dict):
     llm = get_llm()
-    all_rows = []
+
+    prompt = ChatPromptTemplate.from_messages([
+        ("system",
+         "You are an autonomous synthetic data generation agent.\n"
+         "The execution schema is authoritative.\n"
+         "Generate realistic, diverse, schema-compliant JSON.\n"
+         "Return ONLY valid JSON."),
+        ("human",
+         "User intent:\n{prompt}\n\n"
+         "Execution schema:\n{schema}\n\n"
+         "Generate {n} records.")
+    ])
+
+    generated = []
 
     for batch in state["batches"]:
-        retries = 3
-
-        for attempt in range(retries):
-            response = llm.invoke(
-                prompt.format(
-                    schema=state["schema"].model_dump(),
-                    batch_size=batch["size"]
-                )
-            )
-
+        for _ in range(3):
+            response = llm.invoke(prompt.format(
+                prompt=state["prompt"],
+                schema=json.dumps(state["execution_schema"], indent=2),
+                n=batch["size"]
+            ))
             try:
-                rows = safe_json_load(response.content)
-                all_rows.extend(rows)
-                print(f"Generated batch {batch['batch_id']}")
+                generated.extend(safe_json(response.content))
                 break
-
-            except Exception as e:
-                print(
-                    f"Batch {batch['batch_id']} failed "
-                    f"(attempt {attempt + 1}/{retries}): {e}"
-                )
+            except Exception:
                 time.sleep(1)
-
         else:
-            raise RuntimeError(
-                f"Failed to generate valid JSON for batch {batch['batch_id']}"
-            )
+            raise RuntimeError("LLM failed to produce valid JSON")
 
-    return {"final_data": all_rows}
+    return {**state, "generated_rows": generated}
+

@@ -1,14 +1,15 @@
-# We cannot say to p[rint 1000 at once so divided all into batches like 10*100]
-
 def plan_batches(state: dict):
-    total_rows = state["num_rows"]
-    batch_size = 100
+    rows = state["rows"]
+    batch_size = 25
 
     batches = []
-    for start in range(0, total_rows, batch_size):
+    for i in range(0, rows, batch_size):
         batches.append({
             "batch_id": len(batches),
-            "size": min(batch_size, total_rows - start)
+            "size": min(batch_size, rows - i)
         })
 
-    return {"batches": batches}
+    return {
+        **state,
+        "batches": batches
+    }
