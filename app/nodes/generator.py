@@ -1,41 +1,47 @@
-import json, time
-from langchain_core.prompts import ChatPromptTemplate
+import json, time, re
 from app.llm import get_llm
 
-def safe_json(text):
-    return json.loads(text.replace("```json", "").replace("```", "").strip())
+def extract_array(text: str):
+    text = re.sub(r"```(json)?", "", str(text), flags=re.I)
+    match = re.search(r"\[.*\]", text, re.S)
+    if not match:
+        raise ValueError("No JSON array")
+    return json.loads(match.group(0))
 
 def generate_batches(state: dict):
     llm = get_llm()
-
-    prompt = ChatPromptTemplate.from_messages([
-        ("system",
-         "You are an autonomous synthetic data generation agent.\n"
-         "The execution schema is authoritative.\n"
-         "Generate realistic, diverse, schema-compliant JSON.\n"
-         "Return ONLY valid JSON."),
-        ("human",
-         "User intent:\n{prompt}\n\n"
-         "Execution schema:\n{schema}\n\n"
-         "Generate {n} records.")
-    ])
-
     generated = []
 
     for batch in state["batches"]:
         for _ in range(3):
-            response = llm.invoke(prompt.format(
-                prompt=state["prompt"],
-                schema=json.dumps(state["execution_schema"], indent=2),
-                n=batch["size"]
-            ))
+            messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        "Generate synthetic data.\n"
+                        "STRICT RULES:\n"
+                        "- Output JSON array ONLY\n"
+                        "- Follow schema EXACTLY\n"
+                        "- No extra fields\n"
+                        "- Ensure realistic diversity"
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        f"Schema:\n{json.dumps(state['execution_schema'], indent=2)}\n\n"
+                        f"Generate {batch['size']} records."
+                    )
+                }
+            ]
+
+            raw = llm.invoke(messages)
+            raw_text = raw.content if hasattr(raw, "content") else raw
+
             try:
-                generated.extend(safe_json(response.content))
+                generated.extend(extract_array(raw_text))
                 break
             except Exception:
                 time.sleep(1)
-        else:
-            raise RuntimeError("LLM failed to produce valid JSON")
 
     return {**state, "generated_rows": generated}
-

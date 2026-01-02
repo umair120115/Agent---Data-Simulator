@@ -1,7 +1,9 @@
-from app.tools.registry import ToolRegistry
-from app.tools.filesystem import FileSystemTool
-from app.tools.math_tool import MathTool
 
-tool_registry = ToolRegistry()
+from .registry import tool_registry
+from .filesystem import FileSystemTool
+from .pdf_reader import PDFReaderTool
+from .json_writer import JSONWriterTool
+
 tool_registry.register("filesystem", FileSystemTool())
-tool_registry.register("math", MathTool())
+tool_registry.register("json_writer", JSONWriterTool())
+tool_registry.register("pdf_reader", PDFReaderTool())

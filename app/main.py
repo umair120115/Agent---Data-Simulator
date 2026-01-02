@@ -3,11 +3,20 @@ from app.graph import app
 
 print("Invoking agent...")
 
+# result = app.invoke({
+#     "prompt": "Generate realistic banking investment portfolio data",
+#     "rows": 100,
+#     "schema_path": "schema.json",
+#     "schema_definition_path": "schema_definition.xlsx",
+#     "output": {
+#         "format": "txt",
+#         "path": "output.txt"
+#     }
+# })
 result = app.invoke({
-    "prompt": "Generate realistic banking investment portfolio data",
-    "rows": 100,
-    "schema_path": "schema.json",
-    "schema_definition_path": "schema_definition.xlsx",
+    "prompt": "Generate realistic investment portfolio data",
+    "rows": 50,
+    "input_file": "JSON_Sample.pdf",   # NEW (optional)
     "output": {
         "format": "txt",
         "path": "output.txt"
