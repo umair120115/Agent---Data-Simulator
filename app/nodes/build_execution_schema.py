@@ -1,5 +1,3 @@
-def build_execution_schema(state: dict):
-    return {
-        **state,
-        "execution_schema": state["normalized_schema"]
-    }
+# app/nodes/build_execution_schema.py
+def build_execution_schema(state):
+    return {**state, "execution_schema": state["merged_schema"]}

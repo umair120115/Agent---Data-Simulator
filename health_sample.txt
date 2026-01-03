@@ -1,0 +1,152 @@
+Healthcare Patient Records – Data Specification
+
+Overview
+This dataset represents synthetic healthcare patient records used for analytics,
+compliance testing, and AI model training. The data must not contain real patient
+information and should look realistic.
+
+--------------------------------------------------
+ENTITY: Patient Profile
+--------------------------------------------------
+
+Each record represents one patient.
+
+Patient Attributes:
+
+Field Name: patient_id
+Description: Unique identifier for the patient
+Data Type: string
+Constraints: Alphanumeric, unique
+
+Field Name: full_name
+Description: Full name of the patient
+Data Type: string
+Constraints: Realistic human name
+
+Field Name: gender
+Description: Gender of the patient
+Data Type: string
+Constraints: Male, Female, Other
+
+Field Name: date_of_birth
+Description: Patient date of birth
+Data Type: date
+Constraints: YYYY-MM-DD
+
+Field Name: age
+Description: Patient age
+Data Type: integer
+Constraints: Must match date_of_birth
+
+Field Name: blood_group
+Description: Blood type
+Data Type: string
+Constraints: A+, A-, B+, B-, AB+, AB-, O+, O-
+
+Field Name: contact_number
+Description: Patient contact phone number
+Data Type: string
+Constraints: 10–15 digits
+
+Field Name: email
+Description: Patient email address
+Data Type: string
+Constraints: Valid email format
+
+Field Name: address
+Description: Residential address
+Data Type: string
+Constraints: Realistic address
+
+Field Name: city
+Description: City of residence
+Data Type: string
+
+Field Name: country
+Description: Country of residence
+Data Type: string
+
+--------------------------------------------------
+ENTITY: Medical Visit Information
+--------------------------------------------------
+
+Each patient can have multiple medical visits.
+
+Visit Attributes:
+
+Field Name: visit_id
+Description: Unique visit identifier
+Data Type: string
+Constraints: Alphanumeric
+
+Field Name: visit_date
+Description: Date of medical visit
+Data Type: date
+Constraints: YYYY-MM-DD
+
+Field Name: hospital_name
+Description: Name of hospital
+Data Type: string
+Constraints: Realistic hospital name
+
+Field Name: doctor_name
+Description: Attending doctor
+Data Type: string
+Constraints: Realistic human name
+
+Field Name: department
+Description: Medical department
+Data Type: string
+Constraints: Cardiology, Neurology, Orthopedics, Pediatrics, Oncology, Dermatology
+
+Field Name: diagnosis
+Description: Medical diagnosis
+Data Type: string
+Constraints: Realistic medical condition
+
+Field Name: treatment
+Description: Prescribed treatment
+Data Type: string
+
+Field Name: medication
+Description: Prescribed medication
+Data Type: string
+
+Field Name: follow_up_required
+Description: Whether follow-up is required
+Data Type: boolean
+Constraints: true or false
+
+Field Name: visit_cost
+Description: Cost of the medical visit
+Data Type: number
+Constraints: Positive numeric value
+
+--------------------------------------------------
+OUTPUT EXPECTATIONS
+--------------------------------------------------
+
+- Each record should include:
+  - One patient profile
+  - An array of medical visits
+
+- Data must be:
+  - Fully synthetic
+  - Internally consistent
+  - Realistic but not real
+
+- The output format may vary based on user prompt:
+  - JSON
+  - CSV
+  - TXT summary
+
+--------------------------------------------------
+EXAMPLE (DESCRIPTION ONLY – NOT DATA)
+--------------------------------------------------
+
+A 45-year-old male patient from Berlin visits a cardiologist twice in one year
+for hypertension treatment, with realistic medications and visit costs.
+
+--------------------------------------------------
+END OF FILE
+--------------------------------------------------
